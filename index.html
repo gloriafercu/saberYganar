@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="css/styles.css">
+	<title>Saber y Ganar</title>
+</head>
+
+<body>
+	<header>
+		<h1 class="header-title">Saber y Ganar</h1>
+	</header>
+
+	<main class="wrapper">
+		<section class="quiz">
+			<!-- <div class="start-game">
+				<button class="start-button">Empieza a jugar</button>
+			</div> -->
+			<div class="show-quiz">
+				<label class="timer"></label>
+				<h2 class="quiz-questions"></h2>
+				<ul class="quiz-answers"></ul>
+			</div>
+			<div class="buttons">
+				<button class="send-answer">Enviar respuesta</button>
+				<button class="next-question">Siguiente pregunta</button>
+			</div>
+			<div class="msg"></div>
+			<div class="info-gamer">
+				<input type="text" class="input-name" placeholder="Introduce tu nombre">
+				<input type="submit" class="button-save" value="Guardar">
+			</div>
+		</section>
+		<aside class="scores">
+			<h2 class="scores-title">Marcadores</h2>
+			<ul class="historic"></ul>
+		</aside>
+		<aside class="statistics">
+			<h2 class="statistics-title">Estadísticas</h2>
+			<h4 class="statistics-items">Velocidad promedio respondiendo:
+				<span class="statistics-time"> segundos</span>
+			</h4>
+			<h4 class="statistics-items">Preguntas acertadas:
+				<span class="correct-answer"></span>
+			</h4>
+			<h4 class="statistics-items">Preguntas fallidas:
+				<span class="failed-answer"></span>
+			</h4>
+		</aside>
+	</main>
+
+	<script src="js/main.js"></script>
+	<script>
+		application().start();
+	</script>
+
+</body>
+
+</html>
