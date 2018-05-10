@@ -8,7 +8,7 @@ function application() {
 	var correctAnswers = 0;
 	var failedAnswers = 0;
 	var entries = [];
-	var timer = 0;
+	var counter = 0;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -124,21 +124,15 @@ function application() {
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
-	function incrementTimer() {
-		var seconds = document.querySelector('.timer');
-		timer = setInterval(
-			function() {
-				if (timer <= 20) {
-					timer++;
-					seconds.innerHTML = timer;
-				// } else {
-				// 	stoptimer();
-				// 	getNewQuestion();
-				// }
-			}
-		}, 1000);
-	}
 
+
+	function incrementTimer() {
+			counter++;
+			var timer = document.querySelector('.timer');
+			timer.innerHTML = counter;
+			console.log(counter);
+		}
+		setInterval(incrementTimer, 1000);
 	// function getScores() {
 	//
 	//

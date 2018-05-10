@@ -31,11 +31,7 @@
 .hidden {
 	display: none;
 }
-.timer {
-	position: absolute;
-	top: 20px;
-  right: -100px;
-}
+
 .li-answers {
   list-style: none;
 }
