@@ -65,6 +65,7 @@ function application() {
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
 		var showQuiz = document.querySelector('.show-quiz');
+		var buttons = document.querySelector('.buttons');
 		var answersList = '';
 
 		if (indexQuestion < questions.length) {
@@ -82,6 +83,8 @@ function application() {
 
 		} else {
 			showQuiz.innerHTML = '<p class="game-over">¡El juego ha terminado!</p>';
+			buttons.classList.add('hidden');
+			document.querySelector('.info-gamer').classList.remove('hidden');
 		}
 		indexQuestion++;
 	}
@@ -119,6 +122,8 @@ function application() {
 		var failedAnswerContainer = document.querySelector('.failed-answer');
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
+
+
 	function getScores() {
 
 
@@ -170,6 +175,7 @@ function application() {
 		historic.innerHTML = itemsHistoric;
 		resetName();
 	}
+
 
 	function resetName() {
 		document.querySelector('.input-name').value = '';

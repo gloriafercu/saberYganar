@@ -28,6 +28,9 @@
 .failed-answer {
 	color: red;
 }
+.hidden {
+	display: none;
+}
 .timer {
 	position: absolute;
 	top: 20px;
