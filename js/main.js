@@ -1,3 +1,4 @@
+
 function application() {
 
 	var questions = [];
@@ -5,10 +6,14 @@ function application() {
 	var quizQuestions = document.querySelector('.quiz-questions');
 	var message = document.querySelector('.msg');
 	var btnSave = document.querySelector('.button-save');
+	var counterSeconds;
 	var correctAnswers = 0;
 	var failedAnswers = 0;
 	var entries = [];
+	var totalTime = [];
 	var counter = 0;
+	var timeQuestion = 5;
+	var flagEndGame = false;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -62,12 +67,15 @@ function application() {
 		questions = data;
 	});
 
+
 	function getNewQuestion() {
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
 		var showQuiz = document.querySelector('.show-quiz');
 		var buttons = document.querySelector('.buttons');
 		var answersList = '';
+		var selectAnswer = document.querySelector('input[name=answers]:checked');
+
 
 		if (indexQuestion < questions.length) {
 			quizQuestions.innerHTML = questions[indexQuestion].question;
@@ -83,11 +91,15 @@ function application() {
 			quizAnswers.innerHTML = answersList;
 
 		} else {
-			showQuiz.innerHTML = '<p class="game-over">¡El juego ha terminado!</p>';
+			flagEndGame = true;
+			stopCounter();
+
+			showQuiz.innerHTML += '<p class="game-over">¡El juego ha terminado!</p>';
 			buttons.classList.add('hidden');
 			document.querySelector('.info-gamer').classList.remove('hidden');
 		}
 		indexQuestion++;
+
 	}
 
 	function checkUserAnswer() {
@@ -108,6 +120,11 @@ function application() {
 					message.style.color = 'red';
 					addFailedAnswers();
 				}
+				saveTime();
+				stopCounter();
+				resetCounter();
+				getNewQuestion();
+				startCounter();
 			}
 		}
 	}
@@ -125,14 +142,53 @@ function application() {
 	}
 
 
+	// Counter's functions
 
-	function incrementTimer() {
+	function	startCounter(){
+
+		counterSeconds = setInterval(function() {
+			showCounter();
+		}, 1000);
+
+	}
+
+	function showCounter() {
+		if (!flagEndGame){
 			counter++;
-			var timer = document.querySelector('.timer');
-			timer.innerHTML = counter;
-			console.log(counter);
+			var timerContainer = document.querySelector('.timer');
+			timerContainer.innerHTML = counter;
+			console.log('flagEndGame', flagEndGame);
+			if (counter === timeQuestion){
+				stopCounter();
+				resetCounter();
+				getNewQuestion();
+				startCounter();
+			}
 		}
-		setInterval(incrementTimer, 1000);
+	}
+	function resetCounter() {
+		counter = 0;
+		console.log("Reseteo contador");
+	}
+
+	function stopCounter() {
+		console.log("Paro contador");
+		clearInterval(counterSeconds);
+	}
+
+
+
+
+
+
+
+	// function incrementTimer() {
+	// 		counter++;
+	// 		var timer = document.querySelector('.timer');
+	// 		timer.innerHTML = counter;
+	// 		console.log(counter);
+	// 	}
+	// 	setInterval(incrementTimer, 1000);
 	// function getScores() {
 	//
 	//
@@ -191,13 +247,50 @@ function application() {
 	}
 
 
+
+	// Recoge eventos del usuario
 	function start() {
 		var nextQuestionBtn = document.querySelector('.next-question');
 		var sendAnswerBtn = document.querySelector('.send-answer');
-		nextQuestionBtn.addEventListener('click', getNewQuestion);
-		sendAnswerBtn.addEventListener('click', checkUserAnswer);
+		var startGame = document.querySelector('.start-button');
+		nextQuestionBtn.addEventListener('click',  function(){
+			saveTime();
+			stopCounter();
+			resetCounter();
+			startCounter();
+			addFailedAnswers();
+			getNewQuestion();
+		});
+		sendAnswerBtn.addEventListener('click', function() {
+			checkUserAnswer();
+		} );
+		startGame.addEventListener('click', beginGame);
 	}
 
+	function saveTime(){
+			console.log(counter);
+			totalTime.push(counter);
+			console.log(totalTime);
+
+			var numAnswers = totalTime.length;
+			var sumAnswers = totalTime.reduce(function(a, b){
+			  return a + b;
+			}, 0);
+			var media = sumAnswers / numAnswers;
+
+			var statisticsTime = document.querySelector('.statistics-time');
+			statisticsTime.innerHTML = media.toFixed(2);
+
+	}
+
+
+
+	function beginGame() {
+		console.log("Comienza el juego");
+		getNewQuestion();
+		startCounter();
+
+	}
 	return {
 		start: start,
 		getNewQuestion: getNewQuestion,
