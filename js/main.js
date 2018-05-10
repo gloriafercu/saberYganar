@@ -8,6 +8,7 @@ function application() {
 	var correctAnswers = 0;
 	var failedAnswers = 0;
 	var entries = [];
+	var timer = 0;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -123,36 +124,50 @@ function application() {
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
-
-	function getScores() {
-
-
-
-		// function recalcularAcertandoPregunta(marcador, tiempo) {
-		// 	if (tiempo <= 2) {
-		// 		return marcador + 2;
-		// 	}
-		// 	if (tiempo <= 10) {
-		// 		return marcador + 1;
-		// 	}
-		// 	if (tiempo > 10){
-		// 		return marcador;
-		// 	}
-		// }
-		// function recalcularFallandoPregunta(marcador, tiempo) {
-		// 	if (tiempo <= 10) {
-		// 		return marcador - 1;
-		// 	}
-		// 	if (tiempo < 20) {
-		// 		return marcador - 2;
-		// 	}
-		// }
-		// function recalcularSinRespuesta(marcador) {
-		// 	return marcador - 3;
-		// }
-
+	function incrementTimer() {
+		var seconds = document.querySelector('.timer');
+		timer = setInterval(
+			function() {
+				if (timer <= 20) {
+					timer++;
+					seconds.innerHTML = timer;
+				// } else {
+				// 	stoptimer();
+				// 	getNewQuestion();
+				// }
+			}
+		}, 1000);
 	}
-	getScores();
+
+	// function getScores() {
+	//
+	//
+	//
+	// 	// function recalcularAcertandoPregunta(marcador, tiempo) {
+	// 	// 	if (tiempo <= 2) {
+	// 	// 		return marcador + 2;
+	// 	// 	}
+	// 	// 	if (tiempo <= 10) {
+	// 	// 		return marcador + 1;
+	// 	// 	}
+	// 	// 	if (tiempo > 10){
+	// 	// 		return marcador;
+	// 	// 	}
+	// 	// }
+	// 	// function recalcularFallandoPregunta(marcador, tiempo) {
+	// 	// 	if (tiempo <= 10) {
+	// 	// 		return marcador - 1;
+	// 	// 	}
+	// 	// 	if (tiempo < 20) {
+	// 	// 		return marcador - 2;
+	// 	// 	}
+	// 	// }
+	// 	// function recalcularSinRespuesta(marcador) {
+	// 	// 	return marcador - 3;
+	// 	// }
+	//
+	// }
+	// getScores();
 
 	function createHistoric() {
 		var nameGamer = document.querySelector('.input-name').value;
