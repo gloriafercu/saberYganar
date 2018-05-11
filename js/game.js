@@ -150,6 +150,12 @@ function application() {
 		counter++;
 		var timerContainer = document.querySelector('.timer');
 		timerContainer.innerHTML = counter;
+		if (counter == timeQuestion) {
+			stopCounter();
+			resetCounter();
+			getNewQuestion();
+			initCounter();
+		}
 	}
 
 	function stopCounter() {
