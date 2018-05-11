@@ -5,6 +5,7 @@ function application() {
 	var quizQuestions = document.querySelector('.quiz-questions');
 	var message = document.querySelector('.msg');
 	var btnSave = document.querySelector('.button-save');
+	var buttonsContainer;
 	var correctAnswers = 0;
 	var failedAnswers = 0;
 	var entries = [];
@@ -76,13 +77,13 @@ function application() {
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
 		var showQuiz = document.querySelector('.show-quiz');
-		var buttons = document.querySelector('.buttons');
+		buttonsContainer = document.querySelector('.buttons');
 		var answersList = '';
 
 		if (indexQuestion < questions.length) {
 			quizQuestions.innerHTML = questions[indexQuestion].question;
 			quizQuestions.setAttribute('id', questions[indexQuestion].id);
-
+			buttonsContainer.classList.remove('hidden');
 			for (var j = 0; j < questions[indexQuestion].answers.length; j++) {
 				answersList +=
 				'<li class="li-answers">' +
@@ -94,8 +95,9 @@ function application() {
 
 		} else {
 			showQuiz.innerHTML = '<p class="game-over">¡El juego ha terminado!</p>';
-			buttons.classList.add('hidden');
-			document.querySelector('.info-gamer').classList.remove('hidden');
+			buttonsContainer.classList.add('hidden');
+			var infoGamerContainer = document.querySelector('.info-gamer');
+			infoGamerContainer.remove('hidden');
 		}
 		indexQuestion++;
 	}
@@ -160,16 +162,13 @@ function application() {
 		timeUsers.push(counter);
 		console.log(counter);
 		console.log(timeUsers);
-
 		var numAnswers = timeUsers.length;
 		var sumTimeUsers = timeUsers.reduce(function(accumulator, nextValue){
 		  return accumulator + nextValue;
 		}, 0);
 		var average = sumTimeUsers / numAnswers;
-
 		var statisticsTime = document.querySelector('.statistics-time');
 		statisticsTime.innerHTML = average.toFixed(0);
-
 	}
 
 	function createHistoric() {
