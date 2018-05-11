@@ -2,9 +2,8 @@ function application() {
 
 	var questions = [];
 	var indexQuestion = 0;
-	var quizQuestions = document.querySelector('.quiz-questions');
-	var message = document.querySelector('.msg');
-	var btnSave = document.querySelector('.button-save');
+	var quizQuestions;
+	var message;
 	var buttonsContainer;
 	var correctAnswers = 0;
 	var failedAnswers = 0;
@@ -77,6 +76,7 @@ function application() {
 	}
 
 	function getNewQuestion() {
+		message = document.querySelector('.msg');
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
 		var showQuiz = document.querySelector('.show-quiz');
@@ -84,6 +84,7 @@ function application() {
 		var answersList = '';
 
 		if (indexQuestion < questions.length) {
+			quizQuestions = document.querySelector('.quiz-questions');
 			quizQuestions.innerHTML = questions[indexQuestion].question;
 			quizQuestions.setAttribute('id', questions[indexQuestion].id);
 			buttonsContainer.classList.remove('hidden');
@@ -119,14 +120,12 @@ function application() {
 		for (var i = 0; i < answers.length; i++) {
 			if (answers[i].checked) {
 				userAnswerID = answers[i].id;
-
 				if (questions[questionID].correctAnswer.id == userAnswerID) {
 					message.innerHTML = '¡Correcto!';
 					message.style.color = 'green';
 					addCorrectAnswers();
 					console.log('Respuesta correcta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
 					totalScore += getScoresWhenAnswerIsCorrect(points, counter );
-
 					console.log('totalScore: ', totalScore);
 				} else {
 					message.innerHTML = '¡Fallaste!';
@@ -138,7 +137,6 @@ function application() {
 				}
 			}
 		}
-
 		saveTime();
 	}
 
@@ -147,14 +145,12 @@ function application() {
 		if (scoreTime <= 2) {
 			var a = score + 2;
 			console.log("Sumamos al score 2 puntos: "+ score + " +2 =>" + a);
-
 			return score + 2;
 		}
 		if (scoreTime <= 10) {
 			b = score + 1;
 			console.log("Sumamos al score 1 punto: "+ score + " +1 =>" + b);
 			return score + 1;
-
 		}
 		if (scoreTime > 10){
 			var c = score;
@@ -165,20 +161,13 @@ function application() {
 	function getScoresWhenAnswerIsNotCorrect(score, scoreTime) {
 		console.log('------ Info getScoresWhenAnswerIsNotCorrect: '+ score +' - '+ scoreTime);
 		if (scoreTime <= 10) {
-			var a = score - 1;
-			console.log("Restamos 1 punto:"+ score + " -1 =>" + a);
 			return score - 1;
 		}
 		if (scoreTime < 20) {
-			var b = score - 2;
-			console.log("Restamos 2 puntos:"+ score + " -2 =>" + b);
 			return score - 2;
 		}
 	}
 	function getScoresWhenQuestionIsNotAnswer(score) {
-
-		var c = score - 3;
-		console.log("Restamos 3 puntos:"+ score + " -3 =>" + c);
 		return score - 3;
 	};
 
@@ -187,11 +176,7 @@ function application() {
 		console.log("TotalScore: "+totalScore);
 		addFailedAnswers();
 		saveTime();
-
 	}
-
-
-
 
 	function addCorrectAnswers() {
 		correctAnswers++;
@@ -206,13 +191,10 @@ function application() {
 	}
 
 	function initCounter() {
-		timer = setInterval(function() {
-			showCounter();
-		}, 1000);
+		timer = setInterval(showCounter, 1000);
 	}
 
 	function showCounter() {
-
 		if (endGame == false){
 			counter++;
 			var timerContainer = document.querySelector('.timer');
@@ -262,7 +244,7 @@ function application() {
 		entries.push(entry);
 		showHistoric();
 	}
-	btnSave.addEventListener('click', createHistoric);
+
 
 	function showHistoric() {
 		var itemsHistoric = '';
@@ -283,20 +265,11 @@ function application() {
 		var startGameBtn = document.querySelector('.start-button');
 		var nextQuestionBtn = document.querySelector('.next-question');
 		var sendAnswerBtn = document.querySelector('.send-answer');
+		var btnSave = document.querySelector('.button-save');
 		startGameBtn.addEventListener('click', startToPlayGame);
 		nextQuestionBtn.addEventListener('click', onNextQuestion);
 		sendAnswerBtn.addEventListener('click', onSendAnswer);
-	}
-
-	function onSendAnswer(){
-		checkUserAnswer();
-		stopCounter();
-		resetCounter();
-		// Añadimos un retraso de 5 segundos para que se muestre el resultado de la pregunta anterior.
-		setTimeout( function(){
-			getNewQuestion();
-			initCounter();
-		}, 4000);
+		btnSave.addEventListener('click', createHistoric);
 	}
 
 	function onNextQuestion(){
@@ -307,8 +280,17 @@ function application() {
 		initCounter();
 	}
 
+	function onSendAnswer(){
+		checkUserAnswer();
+		stopCounter();
+		resetCounter();
+		setTimeout(function(){
+			getNewQuestion();
+			initCounter();
+		}, 2000);
+	}
+
 	return {
 		start: start
-
 	}
 }
