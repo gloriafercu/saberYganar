@@ -11,6 +11,7 @@ function application() {
 	var counter = 0;
 	var timer;
 	var timeQuestion = 10;
+	var timeUsers = [];
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -85,8 +86,8 @@ function application() {
 			for (var j = 0; j < questions[indexQuestion].answers.length; j++) {
 				answersList +=
 				'<li class="li-answers">' +
-					'<input id="item-' + j + '" type="radio" name="answers"/>' +
-					'<label for="item-' + j + '">' + questions[indexQuestion].answers[j].value + '</label>' +
+					'<input id="' + j + '" type="radio" name="answers"/>' +
+					'<label for="' + j + '">' + questions[indexQuestion].answers[j].value + '</label>' +
 				'</li>';
 			}
 			quizAnswers.innerHTML = answersList;
@@ -119,6 +120,7 @@ function application() {
 				}
 			}
 		}
+		saveTime();
 	}
 
 	function addCorrectAnswers() {
@@ -145,52 +147,30 @@ function application() {
 		timerContainer.innerHTML = counter;
 	}
 
+	function stopCounter() {
+		console.log('Se para el contador!');
+		clearInterval(timer);
+	}
 	function resetCounter() {
 		counter = 0;
 		console.log('Se resetea contador!');
 	}
 
-	function stopCounter() {
-		console.log('Se para el contador!');
-		clearInterval(timer);
+	function saveTime() {
+		timeUsers.push(counter);
+		console.log(counter);
+		console.log(timeUsers);
+
+		var numAnswers = timeUsers.length;
+		var sumTimeUsers = timeUsers.reduce(function(accumulator, nextValue){
+		  return accumulator + nextValue;
+		}, 0);
+		var average = sumTimeUsers / numAnswers;
+
+		var statisticsTime = document.querySelector('.statistics-time');
+		statisticsTime.innerHTML = average.toFixed(0);
+
 	}
-
-
-
-
-
-
-
-
-	// function getScores() {
-	//
-	//
-	//
-	// 	// function recalcularAcertandoPregunta(marcador, tiempo) {
-	// 	// 	if (tiempo <= 2) {
-	// 	// 		return marcador + 2;
-	// 	// 	}
-	// 	// 	if (tiempo <= 10) {
-	// 	// 		return marcador + 1;
-	// 	// 	}
-	// 	// 	if (tiempo > 10){
-	// 	// 		return marcador;
-	// 	// 	}
-	// 	// }
-	// 	// function recalcularFallandoPregunta(marcador, tiempo) {
-	// 	// 	if (tiempo <= 10) {
-	// 	// 		return marcador - 1;
-	// 	// 	}
-	// 	// 	if (tiempo < 20) {
-	// 	// 		return marcador - 2;
-	// 	// 	}
-	// 	// }
-	// 	// function recalcularSinRespuesta(marcador) {
-	// 	// 	return marcador - 3;
-	// 	// }
-	//
-	// }
-	// getScores();
 
 	function createHistoric() {
 		var nameGamer = document.querySelector('.input-name').value;
@@ -208,12 +188,11 @@ function application() {
 		var itemsHistoric = '';
 		var historic = document.querySelector('.historic');
 		for (var i = 0; i < entries.length; i++) {
-			itemsHistoric += '<li class="item-historic">' + entries[i].name + ' : ' + entries[i].points + ' puntos</li>';
+			itemsHistoric += '<li class="item-historic">' + entries[i].name + ': ' + entries[i].points + ' puntos</li>';
 		}
 		historic.innerHTML = itemsHistoric;
 		resetName();
 	}
-
 
 	function resetName() {
 		document.querySelector('.input-name').value = '';
@@ -225,8 +204,21 @@ function application() {
 		var nextQuestionBtn = document.querySelector('.next-question');
 		var sendAnswerBtn = document.querySelector('.send-answer');
 		startGameBtn.addEventListener('click', startToPlayGame);
-		nextQuestionBtn.addEventListener('click', getNewQuestion);
-		sendAnswerBtn.addEventListener('click', checkUserAnswer);
+		nextQuestionBtn.addEventListener('click',
+			function() {
+				getNewQuestion();
+				stopCounter();
+				resetCounter();
+				initCounter();
+			}
+		);
+		sendAnswerBtn.addEventListener('click',
+		function() {
+			checkUserAnswer();
+			stopCounter();
+			resetCounter();
+			//getNewQuestion();
+		});
 	}
 
 	return {
@@ -235,3 +227,35 @@ function application() {
 		checkUserAnswer: checkUserAnswer
 	}
 }
+
+
+
+// function getScores() {
+//
+//
+//
+// 	// function recalcularAcertandoPregunta(marcador, tiempo) {
+// 	// 	if (tiempo <= 2) {
+// 	// 		return marcador + 2;
+// 	// 	}
+// 	// 	if (tiempo <= 10) {
+// 	// 		return marcador + 1;
+// 	// 	}
+// 	// 	if (tiempo > 10){
+// 	// 		return marcador;
+// 	// 	}
+// 	// }
+// 	// function recalcularFallandoPregunta(marcador, tiempo) {
+// 	// 	if (tiempo <= 10) {
+// 	// 		return marcador - 1;
+// 	// 	}
+// 	// 	if (tiempo < 20) {
+// 	// 		return marcador - 2;
+// 	// 	}
+// 	// }
+// 	// function recalcularSinRespuesta(marcador) {
+// 	// 	return marcador - 3;
+// 	// }
+//
+// }
+// getScores();
