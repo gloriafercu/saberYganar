@@ -12,8 +12,8 @@ function application() {
 	var counter = 0;
 	var timer;
 	var timeQuestion = 10;
-	var timeUsers = [];
-	var delayInMilliseconds = 1000; //1 second
+	var timeUser = [];
+	var points = 0;
 
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
@@ -118,11 +118,15 @@ function application() {
 					message.innerHTML = '¡Correcto!';
 					message.style.color = 'green';
 					addCorrectAnswers();
+					getScoresWhenAnswerIsCorrect(points, counter);
 				} else {
 					message.innerHTML = '¡Fallaste!';
 					message.style.color = 'red';
 					addFailedAnswers();
+					getScoresWhenAnswerIsNotCorrect(points, counter);
 				}
+			} else {
+				getScoresWhenQuestionIsNotAnswer(points, counter);
 			}
 		}
 		saveTime();
@@ -168,21 +172,45 @@ function application() {
 	}
 
 	function saveTime() {
-		timeUsers.push(counter);
+		timeUser.push(counter);
 		console.log(counter);
-		console.log(timeUsers);
-		var numAnswers = timeUsers.length;
-		var sumTimeUsers = timeUsers.reduce(function(accumulator, nextValue){
+		console.log(timeUser);
+		var numAnswers = timeUser.length;
+		var sumtimeUser = timeUser.reduce(function(accumulator, nextValue){
 		  return accumulator + nextValue;
 		}, 0);
-		var average = sumTimeUsers / numAnswers;
+		var average = sumtimeUser / numAnswers;
 		var statisticsTime = document.querySelector('.statistics-time');
 		statisticsTime.innerHTML = average.toFixed(0);
 	}
 
-	function createHistoric() {
+	function getScoreswhenAnswerIsCorrect(points, counter) {
+		if (counter <= 2) {
+			return points + 2;
+		}
+		if (counter <= 10) {
+			return points + 1;
+		}
+		if (counter > 10){
+			return points;
+		}
+	}
+	function getScoreswhenAnswerIsNotCorrect(points, counter) {
+		if (counter <= 10) {
+			return points - 1;
+		}
+		if (counter < 20) {
+			return points - 2;
+		}
+	}
+
+	function getScoresWhenQuestionIsNotAnswer(points, counter) {
+		return points - 3;
+	};
+
+	function createHistoric(points) {
 		var nameGamer = document.querySelector('.input-name').value;
-		var points = 5;
+		points;
 		var entry = {
 			name: nameGamer,
 			points: points
@@ -232,39 +260,5 @@ function application() {
 
 	return {
 		start: start
-		// getNewQuestion: getNewQuestion,
-		// checkUserAnswer: checkUserAnswer
 	}
 }
-
-
-
-// function getScores() {
-//
-//
-//
-// 	// function recalcularAcertandoPregunta(marcador, tiempo) {
-// 	// 	if (tiempo <= 2) {
-// 	// 		return marcador + 2;
-// 	// 	}
-// 	// 	if (tiempo <= 10) {
-// 	// 		return marcador + 1;
-// 	// 	}
-// 	// 	if (tiempo > 10){
-// 	// 		return marcador;
-// 	// 	}
-// 	// }
-// 	// function recalcularFallandoPregunta(marcador, tiempo) {
-// 	// 	if (tiempo <= 10) {
-// 	// 		return marcador - 1;
-// 	// 	}
-// 	// 	if (tiempo < 20) {
-// 	// 		return marcador - 2;
-// 	// 	}
-// 	// }
-// 	// function recalcularSinRespuesta(marcador) {
-// 	// 	return marcador - 3;
-// 	// }
-//
-// }
-// getScores();
