@@ -1,19 +1,20 @@
-
 function application() {
 
 	var questions = [];
 	var indexQuestion = 0;
-	var quizQuestions = document.querySelector('.quiz-questions');
-	var message = document.querySelector('.msg');
-	var btnSave = document.querySelector('.button-save');
-	var counterSeconds;
+	var quizQuestions;
+	var message;
+	var buttonsContainer;
 	var correctAnswers = 0;
 	var failedAnswers = 0;
 	var entries = [];
-	var totalTime = [];
 	var counter = 0;
-	var timeQuestion = 5;
-	var flagEndGame = false;
+	var timer;
+	var timeQuestion = 20;
+	var timeUser = [];
+	var points = 0;
+	var totalScore = 0;
+	var endGame = false;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -67,32 +68,42 @@ function application() {
 		questions = data;
 	});
 
+	function startToPlayGame() {
+		var startGameContainer = document.querySelector('.start-game');
+		startGameContainer.classList.add('hidden');
+		getNewQuestion();
+		initCounter();
+	}
+
 	function getNewQuestion() {
+		message = document.querySelector('.msg');
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
 		var showQuiz = document.querySelector('.show-quiz');
-		var buttons = document.querySelector('.buttons');
+		buttonsContainer = document.querySelector('.buttons');
 		var answersList = '';
-		var selectAnswer = document.querySelector('input[name=answers]:checked');
 
 		if (indexQuestion < questions.length) {
+			quizQuestions = document.querySelector('.quiz-questions');
 			quizQuestions.innerHTML = questions[indexQuestion].question;
 			quizQuestions.setAttribute('id', questions[indexQuestion].id);
+			buttonsContainer.classList.remove('hidden');
 			for (var j = 0; j < questions[indexQuestion].answers.length; j++) {
 				answersList +=
-					'<li class="li-answers">' +
-						'<input id="' + j + '" type="radio" name="answers"/>' +
-						'<label for"' + j + '">' + questions[indexQuestion].answers[j].value + '</label>' +
-					'</li>';
+				'<li class="li-answers">' +
+					'<input id="' + j + '" type="radio" name="answers"/>' +
+					'<label for="' + j + '">' + questions[indexQuestion].answers[j].value + '</label>' +
+				'</li>';
 			}
 			quizAnswers.innerHTML = answersList;
 
 		} else {
-			flagEndGame = true;
-			stopCounter();
-			showQuiz.innerHTML += '<p class="game-over">¡El juego ha terminado!</p>';
-			buttons.classList.add('hidden');
-			document.querySelector('.info-gamer').classList.remove('hidden');
+			endGame = true;
+			message.innerHTML = '¡El juego ha terminado!';
+			message.style.color = 'blue';
+			buttonsContainer.classList.add('hidden');
+			var infoGamerContainer = document.querySelector('.info-gamer');
+			infoGamerContainer.classList.remove('hidden');
 		}
 		indexQuestion++;
 	}
@@ -102,6 +113,7 @@ function application() {
 		var answers = document.getElementsByName('answers');
 		var questionID = quizQuestions;
 		questionID = questionID.getAttribute('id');
+
 		for (var i = 0; i < answers.length; i++) {
 			if (answers[i].checked) {
 				userAnswerID = answers[i].id;
@@ -109,18 +121,58 @@ function application() {
 					message.innerHTML = '¡Correcto!';
 					message.style.color = 'green';
 					addCorrectAnswers();
+					console.log('Respuesta correcta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
+					totalScore += getScoresWhenAnswerIsCorrect(points, counter );
+					console.log('totalScore: ', totalScore);
 				} else {
 					message.innerHTML = '¡Fallaste!';
 					message.style.color = 'red';
 					addFailedAnswers();
+					console.log('Respuesta incorrecta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
+					totalScore += getScoresWhenAnswerIsNotCorrect(points, counter);
+					console.log('totalScore: ', totalScore);
 				}
-				saveTime();
-				stopCounter();
-				resetCounter();
-				getNewQuestion();
-				startCounter();
 			}
 		}
+		saveTime();
+	}
+
+	function getScoresWhenAnswerIsCorrect(score, scoreTime) {
+		console.log('------ Info getScoresWhenAnswerIsCorrect: '+ score +' - '+ scoreTime);
+		if (scoreTime <= 2) {
+			var a = score + 2;
+			console.log("Sumamos al score 2 puntos: "+ score + " +2 =>" + a);
+			return score + 2;
+		}
+		if (scoreTime <= 10) {
+			b = score + 1;
+			console.log("Sumamos al score 1 punto: "+ score + " +1 =>" + b);
+			return score + 1;
+		}
+		if (scoreTime > 10){
+			var c = score;
+			console.log("Mantenemos el score: "+ score + " +0 =>" + c);
+			return score;
+		}
+	}
+	function getScoresWhenAnswerIsNotCorrect(score, scoreTime) {
+		console.log('------ Info getScoresWhenAnswerIsNotCorrect: '+ score +' - '+ scoreTime);
+		if (scoreTime <= 10) {
+			return score - 1;
+		}
+		if (scoreTime < 20) {
+			return score - 2;
+		}
+	}
+	function getScoresWhenQuestionIsNotAnswer(score) {
+		return score - 3;
+	};
+
+	function checkQuestionIsNotAnswered(){
+		totalScore += getScoresWhenQuestionIsNotAnswer(points);
+		console.log("TotalScore: "+totalScore);
+		addFailedAnswers();
+		saveTime();
 	}
 
 	function addCorrectAnswers() {
@@ -135,116 +187,107 @@ function application() {
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
-
-	// Counter's functions
-
-	function	startCounter(){
-
-		counterSeconds = setInterval(function() {
-			showCounter();
-		}, 1000);
-
+	function initCounter() {
+		timer = setInterval(showCounter, 1000);
 	}
 
 	function showCounter() {
-		if (!flagEndGame){
+		if (endGame == false){
 			counter++;
 			var timerContainer = document.querySelector('.timer');
 			timerContainer.innerHTML = counter;
-			console.log('flagEndGame', flagEndGame);
-			if (counter === timeQuestion){
+			if (counter == timeQuestion) {
 				stopCounter();
 				resetCounter();
+				checkQuestionIsNotAnswered();
 				getNewQuestion();
-				startCounter();
+				initCounter();
 			}
 		}
-	}
-	function resetCounter() {
-		counter = 0;
-		console.log("Reseteo contador");
+
+
 	}
 
 	function stopCounter() {
-		console.log("Paro contador");
-		clearInterval(counterSeconds);
+		console.log('Se para el contador!');
+		clearInterval(timer);
+	}
+	function resetCounter() {
+		counter = 0;
+		console.log('Se resetea contador!');
 	}
 
-	function createHistoric() {
+	function saveTime() {
+		timeUser.push(counter);
+		console.log('[SaveTime counter ]: ' + counter);
+		console.log('[SaveTime timeUser ]: ' + timeUser);
+		var numAnswers = timeUser.length;
+		var sumtimeUser = timeUser.reduce(function(accumulator, nextValue){
+		  return accumulator + nextValue;
+		}, 0);
+		var average = sumtimeUser / numAnswers;
+		var statisticsTime = document.querySelector('.statistics-time');
+		statisticsTime.innerHTML = average.toFixed(0);
+	}
+
+
+
+	function createHistoric(points) {
 		var nameGamer = document.querySelector('.input-name').value;
-		var points = 5;
 		var entry = {
 			name: nameGamer,
-			points: points
+			points: totalScore
 		}
 		entries.push(entry);
 		showHistoric();
 	}
-	btnSave.addEventListener('click', createHistoric);
+
 
 	function showHistoric() {
 		var itemsHistoric = '';
 		var historic = document.querySelector('.historic');
 		for (var i = 0; i < entries.length; i++) {
-			itemsHistoric += '<li class="item-historic">' + entries[i].name + ' : ' + entries[i].points + ' puntos</li>';
+			itemsHistoric += '<li class="item-historic">' + entries[i].name + ': ' + entries[i].points + ' puntos</li>';
 		}
 		historic.innerHTML = itemsHistoric;
 		resetName();
 	}
-
 
 	function resetName() {
 		document.querySelector('.input-name').value = '';
 	}
 
 
-
-	// Recoge eventos del usuario
 	function start() {
+		var startGameBtn = document.querySelector('.start-button');
 		var nextQuestionBtn = document.querySelector('.next-question');
 		var sendAnswerBtn = document.querySelector('.send-answer');
-		var startGame = document.querySelector('.start-button');
-		nextQuestionBtn.addEventListener('click',  function(){
-			saveTime();
-			stopCounter();
-			resetCounter();
-			startCounter();
-			addFailedAnswers();
-			getNewQuestion();
-		});
-		sendAnswerBtn.addEventListener('click', function() {
-			checkUserAnswer();
-		} );
-		startGame.addEventListener('click', beginGame);
+		var btnSave = document.querySelector('.button-save');
+		startGameBtn.addEventListener('click', startToPlayGame);
+		nextQuestionBtn.addEventListener('click', onNextQuestion);
+		sendAnswerBtn.addEventListener('click', onSendAnswer);
+		btnSave.addEventListener('click', createHistoric);
 	}
 
-	function saveTime(){
-			console.log(counter);
-			totalTime.push(counter);
-			console.log(totalTime);
-
-			var numAnswers = totalTime.length;
-			var sumAnswers = totalTime.reduce(function(a, b){
-			  return a + b;
-			}, 0);
-			var media = sumAnswers / numAnswers;
-
-			var statisticsTime = document.querySelector('.statistics-time');
-			statisticsTime.innerHTML = media.toFixed(0);
-
-	}
-
-
-
-	function beginGame() {
-		console.log("Comienza el juego");
+	function onNextQuestion(){
+		checkQuestionIsNotAnswered();
 		getNewQuestion();
-		startCounter();
-
+		stopCounter();
+		resetCounter();
+		initCounter();
 	}
+
+	function onSendAnswer(){
+		checkUserAnswer();
+		stopCounter();
+		resetCounter();
+		setTimeout(function(){
+			getNewQuestion();
+			initCounter();
+		}, 2000);
+	}
+
 	return {
-		start: start,
-		getNewQuestion: getNewQuestion,
-		checkUserAnswer: checkUserAnswer
+		start: start
 	}
 }
