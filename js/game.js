@@ -11,10 +11,11 @@ function application() {
 	var entries = [];
 	var counter = 0;
 	var timer;
-	var timeQuestion = 10;
+	var timeQuestion = 20;
 	var timeUser = [];
 	var points = 0;
-
+	var totalScore = 0;
+	var endGame = false;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -96,6 +97,7 @@ function application() {
 			quizAnswers.innerHTML = answersList;
 
 		} else {
+			endGame = true;
 			message.innerHTML = '¡El juego ha terminado!';
 			message.style.color = 'blue';
 			buttonsContainer.classList.add('hidden');
@@ -104,6 +106,9 @@ function application() {
 		}
 		indexQuestion++;
 	}
+
+
+
 
 	function checkUserAnswer() {
 		var userAnswerID;
@@ -114,23 +119,79 @@ function application() {
 		for (var i = 0; i < answers.length; i++) {
 			if (answers[i].checked) {
 				userAnswerID = answers[i].id;
+
 				if (questions[questionID].correctAnswer.id == userAnswerID) {
 					message.innerHTML = '¡Correcto!';
 					message.style.color = 'green';
 					addCorrectAnswers();
-					getScoresWhenAnswerIsCorrect(points, counter);
+					console.log('Respuesta correcta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
+					totalScore += getScoresWhenAnswerIsCorrect(points, counter );
+
+					console.log('totalScore: ', totalScore);
 				} else {
 					message.innerHTML = '¡Fallaste!';
 					message.style.color = 'red';
 					addFailedAnswers();
-					getScoresWhenAnswerIsNotCorrect(points, counter);
+					console.log('Respuesta incorrecta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
+					totalScore += getScoresWhenAnswerIsNotCorrect(points, counter);
+					console.log('totalScore: ', totalScore);
 				}
-			} else {
-				getScoresWhenQuestionIsNotAnswer(points, counter);
 			}
 		}
+
 		saveTime();
 	}
+
+	function getScoresWhenAnswerIsCorrect(score, scoreTime) {
+		console.log('------ Info getScoresWhenAnswerIsCorrect: '+ score +' - '+ scoreTime);
+		if (scoreTime <= 2) {
+			var a = score + 2;
+			console.log("Sumamos al score 2 puntos: "+ score + " +2 =>" + a);
+
+			return score + 2;
+		}
+		if (scoreTime <= 10) {
+			b = score + 1;
+			console.log("Sumamos al score 1 punto: "+ score + " +1 =>" + b);
+			return score + 1;
+
+		}
+		if (scoreTime > 10){
+			var c = score;
+			console.log("Mantenemos el score: "+ score + " +0 =>" + c);
+			return score;
+		}
+	}
+	function getScoresWhenAnswerIsNotCorrect(score, scoreTime) {
+		console.log('------ Info getScoresWhenAnswerIsNotCorrect: '+ score +' - '+ scoreTime);
+		if (scoreTime <= 10) {
+			var a = score - 1;
+			console.log("Restamos 1 punto:"+ score + " -1 =>" + a);
+			return score - 1;
+		}
+		if (scoreTime < 20) {
+			var b = score - 2;
+			console.log("Restamos 2 puntos:"+ score + " -2 =>" + b);
+			return score - 2;
+		}
+	}
+	function getScoresWhenQuestionIsNotAnswer(score) {
+
+		var c = score - 3;
+		console.log("Restamos 3 puntos:"+ score + " -3 =>" + c);
+		return score - 3;
+	};
+
+	function checkQuestionIsNotAnswered(){
+		totalScore += getScoresWhenQuestionIsNotAnswer(points);
+		console.log("TotalScore: "+totalScore);
+		addFailedAnswers();
+		saveTime();
+
+	}
+
+
+
 
 	function addCorrectAnswers() {
 		correctAnswers++;
@@ -151,15 +212,21 @@ function application() {
 	}
 
 	function showCounter() {
-		counter++;
-		var timerContainer = document.querySelector('.timer');
-		timerContainer.innerHTML = counter;
-		if (counter == timeQuestion) {
-			stopCounter();
-			resetCounter();
-			getNewQuestion();
-			initCounter();
+
+		if (endGame == false){
+			counter++;
+			var timerContainer = document.querySelector('.timer');
+			timerContainer.innerHTML = counter;
+			if (counter == timeQuestion) {
+				stopCounter();
+				resetCounter();
+				checkQuestionIsNotAnswered();
+				getNewQuestion();
+				initCounter();
+			}
 		}
+
+
 	}
 
 	function stopCounter() {
@@ -173,8 +240,8 @@ function application() {
 
 	function saveTime() {
 		timeUser.push(counter);
-		console.log(counter);
-		console.log(timeUser);
+		console.log('[SaveTime counter ]: ' + counter);
+		console.log('[SaveTime timeUser ]: ' + timeUser);
 		var numAnswers = timeUser.length;
 		var sumtimeUser = timeUser.reduce(function(accumulator, nextValue){
 		  return accumulator + nextValue;
@@ -184,36 +251,13 @@ function application() {
 		statisticsTime.innerHTML = average.toFixed(0);
 	}
 
-	function getScoreswhenAnswerIsCorrect(points, counter) {
-		if (counter <= 2) {
-			return points + 2;
-		}
-		if (counter <= 10) {
-			return points + 1;
-		}
-		if (counter > 10){
-			return points;
-		}
-	}
-	function getScoreswhenAnswerIsNotCorrect(points, counter) {
-		if (counter <= 10) {
-			return points - 1;
-		}
-		if (counter < 20) {
-			return points - 2;
-		}
-	}
 
-	function getScoresWhenQuestionIsNotAnswer(points, counter) {
-		return points - 3;
-	};
 
 	function createHistoric(points) {
 		var nameGamer = document.querySelector('.input-name').value;
-		points;
 		var entry = {
 			name: nameGamer,
-			points: points
+			points: totalScore
 		}
 		entries.push(entry);
 		showHistoric();
@@ -240,25 +284,31 @@ function application() {
 		var nextQuestionBtn = document.querySelector('.next-question');
 		var sendAnswerBtn = document.querySelector('.send-answer');
 		startGameBtn.addEventListener('click', startToPlayGame);
-		nextQuestionBtn.addEventListener('click',
-			function() {
-				getNewQuestion();
-				stopCounter();
-				resetCounter();
-				initCounter();
-			}
-		);
-		sendAnswerBtn.addEventListener('click',
-		function() {
-			checkUserAnswer();
-			stopCounter();
-			resetCounter();
-			//getNewQuestion();
+		nextQuestionBtn.addEventListener('click', onNextQuestion);
+		sendAnswerBtn.addEventListener('click', onSendAnswer);
+	}
 
-		});
+	function onSendAnswer(){
+		checkUserAnswer();
+		stopCounter();
+		resetCounter();
+		// Añadimos un retraso de 5 segundos para que se muestre el resultado de la pregunta anterior.
+		setTimeout( function(){
+			getNewQuestion();
+			initCounter();
+		}, 4000);
+	}
+
+	function onNextQuestion(){
+		checkQuestionIsNotAnswered();
+		getNewQuestion();
+		stopCounter();
+		resetCounter();
+		initCounter();
 	}
 
 	return {
 		start: start
+
 	}
 }
