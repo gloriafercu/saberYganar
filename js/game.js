@@ -1,4 +1,3 @@
-
 function application() {
 
 	var questions = [];
@@ -6,14 +5,12 @@ function application() {
 	var quizQuestions = document.querySelector('.quiz-questions');
 	var message = document.querySelector('.msg');
 	var btnSave = document.querySelector('.button-save');
-	var counterSeconds;
 	var correctAnswers = 0;
 	var failedAnswers = 0;
 	var entries = [];
-	var totalTime = [];
 	var counter = 0;
-	var timeQuestion = 5;
-	var flagEndGame = false;
+	var timer;
+	var timeQuestion = 10;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -67,30 +64,35 @@ function application() {
 		questions = data;
 	});
 
+	function startToPlayGame() {
+		var startGameContainer = document.querySelector('.start-game');
+		startGameContainer.classList.add('hidden');
+		getNewQuestion();
+		initCounter();
+	}
+
 	function getNewQuestion() {
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
 		var showQuiz = document.querySelector('.show-quiz');
 		var buttons = document.querySelector('.buttons');
 		var answersList = '';
-		var selectAnswer = document.querySelector('input[name=answers]:checked');
 
 		if (indexQuestion < questions.length) {
 			quizQuestions.innerHTML = questions[indexQuestion].question;
 			quizQuestions.setAttribute('id', questions[indexQuestion].id);
+
 			for (var j = 0; j < questions[indexQuestion].answers.length; j++) {
 				answersList +=
-					'<li class="li-answers">' +
-						'<input id="' + j + '" type="radio" name="answers"/>' +
-						'<label for"' + j + '">' + questions[indexQuestion].answers[j].value + '</label>' +
-					'</li>';
+				'<li class="li-answers">' +
+					'<input id="item-' + j + '" type="radio" name="answers"/>' +
+					'<label for="item-' + j + '">' + questions[indexQuestion].answers[j].value + '</label>' +
+				'</li>';
 			}
 			quizAnswers.innerHTML = answersList;
 
 		} else {
-			flagEndGame = true;
-			stopCounter();
-			showQuiz.innerHTML += '<p class="game-over">¡El juego ha terminado!</p>';
+			showQuiz.innerHTML = '<p class="game-over">¡El juego ha terminado!</p>';
 			buttons.classList.add('hidden');
 			document.querySelector('.info-gamer').classList.remove('hidden');
 		}
@@ -102,6 +104,7 @@ function application() {
 		var answers = document.getElementsByName('answers');
 		var questionID = quizQuestions;
 		questionID = questionID.getAttribute('id');
+
 		for (var i = 0; i < answers.length; i++) {
 			if (answers[i].checked) {
 				userAnswerID = answers[i].id;
@@ -114,11 +117,6 @@ function application() {
 					message.style.color = 'red';
 					addFailedAnswers();
 				}
-				saveTime();
-				stopCounter();
-				resetCounter();
-				getNewQuestion();
-				startCounter();
 			}
 		}
 	}
@@ -135,40 +133,64 @@ function application() {
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
-
-	// Counter's functions
-
-	function	startCounter(){
-
-		counterSeconds = setInterval(function() {
+	function initCounter() {
+		timer = setInterval(function() {
 			showCounter();
 		}, 1000);
-
 	}
 
 	function showCounter() {
-		if (!flagEndGame){
-			counter++;
-			var timerContainer = document.querySelector('.timer');
-			timerContainer.innerHTML = counter;
-			console.log('flagEndGame', flagEndGame);
-			if (counter === timeQuestion){
-				stopCounter();
-				resetCounter();
-				getNewQuestion();
-				startCounter();
-			}
-		}
+		counter++;
+		var timerContainer = document.querySelector('.timer');
+		timerContainer.innerHTML = counter;
 	}
+
 	function resetCounter() {
 		counter = 0;
-		console.log("Reseteo contador");
+		console.log('Se resetea contador!');
 	}
 
 	function stopCounter() {
-		console.log("Paro contador");
-		clearInterval(counterSeconds);
+		console.log('Se para el contador!');
+		clearInterval(timer);
 	}
+
+
+
+
+
+
+
+
+	// function getScores() {
+	//
+	//
+	//
+	// 	// function recalcularAcertandoPregunta(marcador, tiempo) {
+	// 	// 	if (tiempo <= 2) {
+	// 	// 		return marcador + 2;
+	// 	// 	}
+	// 	// 	if (tiempo <= 10) {
+	// 	// 		return marcador + 1;
+	// 	// 	}
+	// 	// 	if (tiempo > 10){
+	// 	// 		return marcador;
+	// 	// 	}
+	// 	// }
+	// 	// function recalcularFallandoPregunta(marcador, tiempo) {
+	// 	// 	if (tiempo <= 10) {
+	// 	// 		return marcador - 1;
+	// 	// 	}
+	// 	// 	if (tiempo < 20) {
+	// 	// 		return marcador - 2;
+	// 	// 	}
+	// 	// }
+	// 	// function recalcularSinRespuesta(marcador) {
+	// 	// 	return marcador - 3;
+	// 	// }
+	//
+	// }
+	// getScores();
 
 	function createHistoric() {
 		var nameGamer = document.querySelector('.input-name').value;
@@ -198,50 +220,15 @@ function application() {
 	}
 
 
-
-	// Recoge eventos del usuario
 	function start() {
+		var startGameBtn = document.querySelector('.start-button');
 		var nextQuestionBtn = document.querySelector('.next-question');
 		var sendAnswerBtn = document.querySelector('.send-answer');
-		var startGame = document.querySelector('.start-button');
-		nextQuestionBtn.addEventListener('click',  function(){
-			saveTime();
-			stopCounter();
-			resetCounter();
-			startCounter();
-			addFailedAnswers();
-			getNewQuestion();
-		});
-		sendAnswerBtn.addEventListener('click', function() {
-			checkUserAnswer();
-		} );
-		startGame.addEventListener('click', beginGame);
+		startGameBtn.addEventListener('click', startToPlayGame);
+		nextQuestionBtn.addEventListener('click', getNewQuestion);
+		sendAnswerBtn.addEventListener('click', checkUserAnswer);
 	}
 
-	function saveTime(){
-			console.log(counter);
-			totalTime.push(counter);
-			console.log(totalTime);
-
-			var numAnswers = totalTime.length;
-			var sumAnswers = totalTime.reduce(function(a, b){
-			  return a + b;
-			}, 0);
-			var media = sumAnswers / numAnswers;
-
-			var statisticsTime = document.querySelector('.statistics-time');
-			statisticsTime.innerHTML = media.toFixed(0);
-
-	}
-
-
-
-	function beginGame() {
-		console.log("Comienza el juego");
-		getNewQuestion();
-		startCounter();
-
-	}
 	return {
 		start: start,
 		getNewQuestion: getNewQuestion,
