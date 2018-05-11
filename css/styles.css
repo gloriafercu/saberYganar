@@ -31,13 +31,15 @@
 .hidden {
 	display: none;
 }
-
+.show {
+	display: block;
+}
 .li-answers {
   list-style: none;
 }
-.msg {
-	font-size: 24px;
-	color: green;
+
+.statistics-time {
+	color: orange;
 }
 .statistics {
 	margin-top: 50px;

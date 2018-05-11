@@ -13,6 +13,8 @@ function application() {
 	var timer;
 	var timeQuestion = 10;
 	var timeUsers = [];
+	var delayInMilliseconds = 1000; //1 second
+
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -94,10 +96,11 @@ function application() {
 			quizAnswers.innerHTML = answersList;
 
 		} else {
-			showQuiz.innerHTML = '<p class="game-over">¡El juego ha terminado!</p>';
+			message.innerHTML = '¡El juego ha terminado!';
+			message.style.color = 'blue';
 			buttonsContainer.classList.add('hidden');
 			var infoGamerContainer = document.querySelector('.info-gamer');
-			infoGamerContainer.remove('hidden');
+			infoGamerContainer.classList.remove('hidden');
 		}
 		indexQuestion++;
 	}
@@ -217,13 +220,14 @@ function application() {
 			stopCounter();
 			resetCounter();
 			//getNewQuestion();
+
 		});
 	}
 
 	return {
-		start: start,
-		getNewQuestion: getNewQuestion,
-		checkUserAnswer: checkUserAnswer
+		start: start
+		// getNewQuestion: getNewQuestion,
+		// checkUserAnswer: checkUserAnswer
 	}
 }
 
