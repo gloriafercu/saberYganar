@@ -7,11 +7,14 @@ function application() {
 	var entries = [];
 	var failedAnswers = 0;
 	var indexQuestion = 0;
+	var infoGamerContainer;
 	var questions = [];
 	var quizQuestions;
 	var message;
 	var points = 0;
 	var showQuiz;
+	var startGameContainer;
+	var startGameBtn;
 	var timeQuestion = 20;
 	var timer;
 	var timeUser = [];
@@ -66,7 +69,7 @@ function application() {
 	}
 
 	function start() {
-		var startGameBtn = document.querySelector('.start-button');
+		startGameBtn = document.querySelector('.button-start');
 		startGameBtn.addEventListener('click', startToPlayGame);
 		var sendAnswerBtn = document.querySelector('.send-answer');
 		sendAnswerBtn.addEventListener('click', onSendAnswer);
@@ -86,7 +89,7 @@ function application() {
 		setTimeout(function() {
 			getNewQuestion();
 			initCounter();
-		}, 1500);
+		}, 1000);
 	}
 
 	function onNextQuestion() {
@@ -98,7 +101,7 @@ function application() {
 	}
 
 	function startToPlayGame() {
-		var startGameContainer = document.querySelector('.start-game');
+		startGameContainer = document.querySelector('.start-game');
 		startGameContainer.classList.add('hidden');
 		getNewQuestion();
 		initCounter();
@@ -141,8 +144,6 @@ function application() {
 		initCounter();
 	}
 
-
-
 	function getNewQuestion() {
 		message = document.querySelector('.msg');
 		message.innerHTML = '';
@@ -170,11 +171,18 @@ function application() {
 	}
 	function gameOver() {
 		onGame = false;
+		addGameOverMessage();
+		addGamerName();
+	}
+	function addGameOverMessage() {
 		showQuiz.classList.add('hidden');
-		var infoGamerContainer = document.querySelector('.info-gamer');
-		infoGamerContainer.classList.remove('hidden');
 		message.innerHTML = '¡El juego ha terminado!';
 		message.style.color = 'blue';
+
+	}
+	function addGamerName() {
+		infoGamerContainer = document.querySelector('.info-gamer');
+		infoGamerContainer.classList.remove('hidden');
 	}
 
 	function checkUserAnswer() {
@@ -288,11 +296,16 @@ function application() {
 			itemsHistoric += '<li class="item-historic">' + entries[i].name + ': ' + entries[i].points + ' puntos</li>';
 		}
 		historic.innerHTML = itemsHistoric;
-		resetName();
+		resetGame();
 	}
 
-	function resetName() {
+	function resetGame() {
 		document.querySelector('.input-name').value = '';
+		message.innerHTML = '';
+		infoGamerContainer.classList.add('hidden');
+		startGameContainer.classList.remove('hidden');
+		// NO ME VUELVE A EMPEZAR EL JUEGO
+
 	}
 
 	return {
