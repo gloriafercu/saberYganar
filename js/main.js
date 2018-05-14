@@ -1,20 +1,20 @@
 function application() {
 
-	var questions = [];
-	var indexQuestion = 0;
-	var quizQuestions;
-	var message;
 	var buttonsContainer;
 	var correctAnswers = 0;
-	var failedAnswers = 0;
-	var entries = [];
 	var counter = 0;
-	var timer;
-	var timeQuestion = 20;
-	var timeUser = [];
+	var onGame = true;
+	var entries = [];
+	var failedAnswers = 0;
+	var indexQuestion = 0;
+	var questions = [];
+	var quizQuestions;
+	var message;
 	var points = 0;
+	var timeQuestion = 20;
+	var timer;
+	var timeUser = [];
 	var totalScore = 0;
-	var endGame = false;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -64,15 +64,79 @@ function application() {
 		callback(serverData);
 	}
 
-	getPairQuestionAnswers(function (data) {
-		questions = data;
-	});
+	function start() {
+		var startGameBtn = document.querySelector('.start-button');
+		startGameBtn.addEventListener('click', startToPlayGame);
+		var sendAnswerBtn = document.querySelector('.send-answer');
+		sendAnswerBtn.addEventListener('click', onSendAnswer);
+		var nextQuestionBtn = document.querySelector('.next-question');
+		nextQuestionBtn.addEventListener('click', onNextQuestion);
+		var btnSave = document.querySelector('.button-save');
+		btnSave.addEventListener('click', createHistoric);
+		getPairQuestionAnswers(function(data) {
+			questions = data;
+		});
+	}
+
+	function onSendAnswer() {
+		checkUserAnswer();
+		stopCounter();
+		resetCounter();
+		setTimeout(function() {
+			getNewQuestion();
+			initCounter();
+		}, 1500);
+	}
+
+	function onNextQuestion() {
+		checkQuestionIsNotAnswered();
+		getNewQuestion();
+		stopCounter();
+		resetCounter();
+		initCounter();
+	}
 
 	function startToPlayGame() {
 		var startGameContainer = document.querySelector('.start-game');
 		startGameContainer.classList.add('hidden');
 		getNewQuestion();
 		initCounter();
+	}
+
+	function initCounter() {
+		timer = setInterval(function() {
+			showCounter(timeout, timeChanged)
+		}, 1000);
+	}
+
+	function showCounter(onTimeout, onTimeChanged) {
+		if (onGame) {
+			counter++;
+			onTimeChanged();
+
+			if (counter == timeQuestion) {
+				onTimeout();
+			}
+		}
+	}
+	function timeChanged() {
+		var timerContainer = document.querySelector('.timer');
+		timerContainer.innerHTML = counter;
+	}
+
+	function timeout() {
+		stopCounter();
+		resetCounter();
+		checkQuestionIsNotAnswered();
+		getNewQuestion();
+		initCounter();
+	}
+
+	function stopCounter() {
+		clearInterval(timer);
+	}
+	function resetCounter() {
+		counter = 0;
 	}
 
 	function getNewQuestion() {
@@ -98,9 +162,10 @@ function application() {
 			quizAnswers.innerHTML = answersList;
 
 		} else {
-			endGame = true;
+			onGame = false;
 			message.innerHTML = '¡El juego ha terminado!';
 			message.style.color = 'blue';
+			showQuiz.classList.add('hidden');
 			buttonsContainer.classList.add('hidden');
 			var infoGamerContainer = document.querySelector('.info-gamer');
 			infoGamerContainer.classList.remove('hidden');
@@ -121,16 +186,12 @@ function application() {
 					message.innerHTML = '¡Correcto!';
 					message.style.color = 'green';
 					addCorrectAnswers();
-					console.log('Respuesta correcta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
 					totalScore += getScoresWhenAnswerIsCorrect(points, counter );
-					console.log('totalScore: ', totalScore);
 				} else {
 					message.innerHTML = '¡Fallaste!';
 					message.style.color = 'red';
 					addFailedAnswers();
-					console.log('Respuesta incorrecta => Puntos: '+points+' - '+ 'Tiempo: '+ counter);
 					totalScore += getScoresWhenAnswerIsNotCorrect(points, counter);
-					console.log('totalScore: ', totalScore);
 				}
 			}
 		}
@@ -138,25 +199,17 @@ function application() {
 	}
 
 	function getScoresWhenAnswerIsCorrect(score, scoreTime) {
-		console.log('------ Info getScoresWhenAnswerIsCorrect: '+ score +' - '+ scoreTime);
 		if (scoreTime <= 2) {
-			var a = score + 2;
-			console.log("Sumamos al score 2 puntos: "+ score + " +2 =>" + a);
 			return score + 2;
 		}
 		if (scoreTime <= 10) {
-			b = score + 1;
-			console.log("Sumamos al score 1 punto: "+ score + " +1 =>" + b);
 			return score + 1;
 		}
 		if (scoreTime > 10){
-			var c = score;
-			console.log("Mantenemos el score: "+ score + " +0 =>" + c);
 			return score;
 		}
 	}
 	function getScoresWhenAnswerIsNotCorrect(score, scoreTime) {
-		console.log('------ Info getScoresWhenAnswerIsNotCorrect: '+ score +' - '+ scoreTime);
 		if (scoreTime <= 10) {
 			return score - 1;
 		}
@@ -170,7 +223,6 @@ function application() {
 
 	function checkQuestionIsNotAnswered(){
 		totalScore += getScoresWhenQuestionIsNotAnswer(points);
-		console.log("TotalScore: "+totalScore);
 		addFailedAnswers();
 		saveTime();
 	}
@@ -187,40 +239,12 @@ function application() {
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
-	function initCounter() {
-		timer = setInterval(showCounter, 1000);
-	}
 
-	function showCounter() {
-		if (endGame == false){
-			counter++;
-			var timerContainer = document.querySelector('.timer');
-			timerContainer.innerHTML = counter;
-			if (counter == timeQuestion) {
-				stopCounter();
-				resetCounter();
-				checkQuestionIsNotAnswered();
-				getNewQuestion();
-				initCounter();
-			}
-		}
-
-
-	}
-
-	function stopCounter() {
-		console.log('Se para el contador!');
-		clearInterval(timer);
-	}
-	function resetCounter() {
-		counter = 0;
-		console.log('Se resetea contador!');
-	}
 
 	function saveTime() {
 		timeUser.push(counter);
-		console.log('[SaveTime counter ]: ' + counter);
-		console.log('[SaveTime timeUser ]: ' + timeUser);
+		// console.log('[SaveTime counter ]: ' + counter);
+		// console.log('[SaveTime timeUser ]: ' + timeUser);
 		var numAnswers = timeUser.length;
 		var sumtimeUser = timeUser.reduce(function(accumulator, nextValue){
 		  return accumulator + nextValue;
@@ -255,36 +279,6 @@ function application() {
 
 	function resetName() {
 		document.querySelector('.input-name').value = '';
-	}
-
-
-	function start() {
-		var startGameBtn = document.querySelector('.start-button');
-		var nextQuestionBtn = document.querySelector('.next-question');
-		var sendAnswerBtn = document.querySelector('.send-answer');
-		var btnSave = document.querySelector('.button-save');
-		startGameBtn.addEventListener('click', startToPlayGame);
-		nextQuestionBtn.addEventListener('click', onNextQuestion);
-		sendAnswerBtn.addEventListener('click', onSendAnswer);
-		btnSave.addEventListener('click', createHistoric);
-	}
-
-	function onNextQuestion(){
-		checkQuestionIsNotAnswered();
-		getNewQuestion();
-		stopCounter();
-		resetCounter();
-		initCounter();
-	}
-
-	function onSendAnswer(){
-		checkUserAnswer();
-		stopCounter();
-		resetCounter();
-		setTimeout(function(){
-			getNewQuestion();
-			initCounter();
-		}, 2000);
 	}
 
 	return {
