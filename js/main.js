@@ -11,6 +11,7 @@ function application() {
 	var quizQuestions;
 	var message;
 	var points = 0;
+	var showQuiz;
 	var timeQuestion = 20;
 	var timer;
 	var timeUser = [];
@@ -113,12 +114,20 @@ function application() {
 		if (onGame) {
 			counter++;
 			onTimeChanged();
-
 			if (counter == timeQuestion) {
 				onTimeout();
 			}
 		}
 	}
+
+	function stopCounter() {
+		clearInterval(timer);
+	}
+
+	function resetCounter() {
+		counter = 0;
+	}
+
 	function timeChanged() {
 		var timerContainer = document.querySelector('.timer');
 		timerContainer.innerHTML = counter;
@@ -132,26 +141,19 @@ function application() {
 		initCounter();
 	}
 
-	function stopCounter() {
-		clearInterval(timer);
-	}
-	function resetCounter() {
-		counter = 0;
-	}
+
 
 	function getNewQuestion() {
 		message = document.querySelector('.msg');
 		message.innerHTML = '';
 		var quizAnswers = document.querySelector('.quiz-answers');
-		var showQuiz = document.querySelector('.show-quiz');
-		buttonsContainer = document.querySelector('.buttons');
+		showQuiz = document.querySelector('.show-quiz');
 		var answersList = '';
-
 		if (indexQuestion < questions.length) {
 			quizQuestions = document.querySelector('.quiz-questions');
 			quizQuestions.innerHTML = questions[indexQuestion].question;
 			quizQuestions.setAttribute('id', questions[indexQuestion].id);
-			buttonsContainer.classList.remove('hidden');
+			showQuiz.classList.remove('hidden');
 			for (var j = 0; j < questions[indexQuestion].answers.length; j++) {
 				answersList +=
 				'<li class="li-answers">' +
@@ -162,15 +164,17 @@ function application() {
 			quizAnswers.innerHTML = answersList;
 
 		} else {
-			onGame = false;
-			message.innerHTML = '¡El juego ha terminado!';
-			message.style.color = 'blue';
-			showQuiz.classList.add('hidden');
-			buttonsContainer.classList.add('hidden');
-			var infoGamerContainer = document.querySelector('.info-gamer');
-			infoGamerContainer.classList.remove('hidden');
+			gameOver();
 		}
 		indexQuestion++;
+	}
+	function gameOver() {
+		onGame = false;
+		showQuiz.classList.add('hidden');
+		var infoGamerContainer = document.querySelector('.info-gamer');
+		infoGamerContainer.classList.remove('hidden');
+		message.innerHTML = '¡El juego ha terminado!';
+		message.style.color = 'blue';
 	}
 
 	function checkUserAnswer() {
@@ -183,19 +187,46 @@ function application() {
 			if (answers[i].checked) {
 				userAnswerID = answers[i].id;
 				if (questions[questionID].correctAnswer.id == userAnswerID) {
-					message.innerHTML = '¡Correcto!';
-					message.style.color = 'green';
-					addCorrectAnswers();
-					totalScore += getScoresWhenAnswerIsCorrect(points, counter );
+					isCorrect();
 				} else {
-					message.innerHTML = '¡Fallaste!';
-					message.style.color = 'red';
-					addFailedAnswers();
-					totalScore += getScoresWhenAnswerIsNotCorrect(points, counter);
+					isNotcorrect();
 				}
 			}
 		}
 		saveTime();
+	}
+
+	function isCorrect() {
+		message.innerHTML = '¡Correcto!';
+		message.style.color = 'green';
+		updateUIcorrectAnswers();
+	}
+
+	function isNotcorrect() {
+		message.innerHTML = '¡Fallaste!';
+		message.style.color = 'red';
+		updateUINotCorrectAnswers();
+	}
+
+	function updateUIcorrectAnswers() {
+		addCorrectAnswers();
+		totalScore += getScoresWhenAnswerIsCorrect(points, counter);
+	}
+	function updateUINotCorrectAnswers() {
+		addFailedAnswers();
+		totalScore += getScoresWhenAnswerIsNotCorrect(points, counter);
+	}
+
+	function addCorrectAnswers() {
+		correctAnswers++;
+		var correctAnswerContainer = document.querySelector('.correct-answer');
+		correctAnswerContainer.innerHTML = correctAnswers;
+	}
+
+	function addFailedAnswers() {
+		failedAnswers++;
+		var failedAnswerContainer = document.querySelector('.failed-answer');
+		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
 	function getScoresWhenAnswerIsCorrect(score, scoreTime) {
@@ -227,20 +258,6 @@ function application() {
 		saveTime();
 	}
 
-	function addCorrectAnswers() {
-		correctAnswers++;
-		var correctAnswerContainer = document.querySelector('.correct-answer');
-		correctAnswerContainer.innerHTML = correctAnswers;
-	}
-
-	function addFailedAnswers() {
-		failedAnswers++;
-		var failedAnswerContainer = document.querySelector('.failed-answer');
-		failedAnswerContainer.innerHTML = failedAnswers;
-	}
-
-
-
 	function saveTime() {
 		timeUser.push(counter);
 		// console.log('[SaveTime counter ]: ' + counter);
@@ -254,18 +271,15 @@ function application() {
 		statisticsTime.innerHTML = average.toFixed(0);
 	}
 
-
-
 	function createHistoric(points) {
-		var nameGamer = document.querySelector('.input-name').value;
+		var gamerName = document.querySelector('.input-name').value;
 		var entry = {
-			name: nameGamer,
+			name: gamerName,
 			points: totalScore
 		}
 		entries.push(entry);
 		showHistoric();
 	}
-
 
 	function showHistoric() {
 		var itemsHistoric = '';
