@@ -166,6 +166,7 @@ function application() {
 
 		} else {
 			gameOver();
+			// resetGame();
 		}
 		indexQuestion++;
 	}
@@ -177,7 +178,7 @@ function application() {
 	function addGameOverMessage() {
 		showQuiz.classList.add('hidden');
 		message.innerHTML = '¡El juego ha terminado!';
-		message.style.color = 'blue';
+		message.style.color = '#6F1BF3';
 
 	}
 	function addGamerName() {
@@ -206,13 +207,13 @@ function application() {
 
 	function isCorrect() {
 		message.innerHTML = '¡Correcto!';
-		message.style.color = 'green';
+		message.style.color = '#23CE6B';
 		updateUIcorrectAnswers();
 	}
 
 	function isNotcorrect() {
 		message.innerHTML = '¡Fallaste!';
-		message.style.color = 'red';
+		message.style.color = '#F15152';
 		updateUINotCorrectAnswers();
 	}
 
@@ -296,7 +297,7 @@ function application() {
 			itemsHistoric += '<li class="item-historic">' + entries[i].name + ': ' + entries[i].points + ' puntos</li>';
 		}
 		historic.innerHTML = itemsHistoric;
-		resetGame();
+
 	}
 
 	function resetGame() {
@@ -304,6 +305,7 @@ function application() {
 		message.innerHTML = '';
 		infoGamerContainer.classList.add('hidden');
 		startGameContainer.classList.remove('hidden');
+
 		// NO ME VUELVE A EMPEZAR EL JUEGO
 
 	}

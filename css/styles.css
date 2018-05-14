@@ -2,7 +2,7 @@
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
-	font-family: 'Rubik', sans-serif;
+	font-family: 'Roboto', sans-serif;
 	margin: 0 auto;
 	font-size: 20px;
 	line-height: 1.5;
@@ -22,7 +22,13 @@
 }
 .body {
 	background-color: #efefef;
-	z-index: 0;
+}
+.wrapper {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	grid-template-rows: 2fr 1fr;
+	grid-row-gap: 30px;
+	padding: 30px 50px;
 }
 .hidden {
 	display: none;
@@ -33,12 +39,30 @@
 	align-items: center;
 	justify-content: center;
 }
+.show-quiz {
+	position: relative;
+	background-color: #fff;
+	line-height: 250px;
+	width: 100%;
+	min-width: 550px;
+	height: 250px;
+}
+.timer {
+	position: absolute;
+	right: 20px;
+	top: -60px;
+	color: #BA1B1D;
+	font-family: 'Signika', sans-serif;
+	font-size: 35px;
+}
+
+.quiz-answers {
+	list-style-type: none;
+	margin: 15px 40px;
+}
 .quiz-questions {
 	font-size: 28px;
 	margin: 15px 25px;
-}
-.quiz-answers {
-	margin: 15px 40px;
 }
 label {
 	padding-left: 20px;
@@ -66,14 +90,7 @@ label {
 	background-color: #fff;
 	transition: ease 0.5s;
 }
-.wrapper {
-	display: grid;
-	grid-template-columns: 2fr 1fr;
-	grid-template-rows: 2fr 1fr;
-	grid-row-gap: 30px;
-	padding: 30px 50px;
-	z-index: 1;
-}
+
 .statistics {
 	grid-column: span 2;
 	margin-bottom: 30px;
@@ -85,27 +102,9 @@ label {
 	color: #499d82;
 	margin-bottom: 20px;
 }
-.show-quiz {
-	position: relative;
-	background-color: #fff;
-	line-height: 250px;
-	width: 100%;
-	min-width: 550px;
-	height: 250px;
-}
-.timer {
-	position: absolute;
-	right: 20px;
-	top: -60px;
-	color: #BA1B1D;
-	font-family: 'Signika', sans-serif;
+.msg {
 	font-size: 35px;
 }
-
-.quiz-answers {
-	list-style-type: none;
-}
-
 .correct-answer {
 	color: green;
 }
@@ -115,20 +114,22 @@ label {
 .statistics-time {
 	color: orange;
 }
-.msg {
-	margin: 30px;
-	font-size: 35px;
-}
+
 .input-name {
 	height: 50px;
 	font-size: 16px;
 	padding: 10px;
-	border: 0;
+	border: 3px solid #499d82;
+	border-radius: 5px;
+
 }
 
-/* @media all and (min-width: 768px) {
+@media all and (max-width: 568px) {
 	.wrapper {
-		grid-template-columns: 1fr 1fr;
-		grid-template-rows: 1fr 1fr;
+		grid-template-columns: 1fr;
+		grid-template-rows: 1fr 1fr 1fr;
 	}
-}  */
+	.quiz-container {
+		grid-row: span 1;
+	}
+}
