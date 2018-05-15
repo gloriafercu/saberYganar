@@ -200,7 +200,7 @@ function application() {
 	function addGameOverMessage() {
 		showQuiz.classList.add('hidden');
 		message.innerHTML = '¡El juego ha terminado!';
-		message.style.color = '#D90368';
+		message.style.color = '#5863F8';
 		message.style.top = '-60px';
 
 	}
@@ -229,7 +229,7 @@ function application() {
 
 	function isCorrect() {
 		message.innerHTML = '¡Correcto!';
-		message.style.color = '#23CE6B';
+		message.style.color = '#499d82';
 		message.style.top = '0';
 
 		updateUIcorrectAnswers();
@@ -237,7 +237,7 @@ function application() {
 
 	function isNotcorrect() {
 		message.innerHTML = '¡Fallaste!';
-		message.style.color = '#F15152';
+		message.style.color = '#BA1B1D';
 		message.style.top = '0';
 		updateUINotCorrectAnswers();
 	}
