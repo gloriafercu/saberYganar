@@ -19,6 +19,9 @@ function application() {
 	var timer;
 	var timeUser = [];
 	var totalScore = 0;
+	var statisticsTime;
+	var correctAnswerContainer;
+	var failedAnswerContainer;
 
 	/* Con la función getPairQuestionAnswers lo que hago es simular la respuesta de un servidor para obtener las preguntas del juego */
 
@@ -76,7 +79,7 @@ function application() {
 		var nextQuestionBtn = document.querySelector('.next-question');
 		nextQuestionBtn.addEventListener('click', onNextQuestion);
 		var btnSave = document.querySelector('.button-save');
-		btnSave.addEventListener('click', createHistoric);
+		btnSave.addEventListener('click', onSaveData);
 		getPairQuestionAnswers(function(data) {
 			questions = data;
 		});
@@ -99,10 +102,15 @@ function application() {
 		resetCounter();
 		initCounter();
 	}
+	function onSaveData() {
+		createHistoric();
+		resetGame();
+	}
 
 	function startToPlayGame() {
 		startGameContainer = document.querySelector('.start-game');
 		startGameContainer.classList.add('hidden');
+		onGame = true;
 		getNewQuestion();
 		initCounter();
 	}
@@ -117,18 +125,11 @@ function application() {
 		if (onGame) {
 			counter++;
 			onTimeChanged();
+			console.log('Timer: ', counter);
 			if (counter == timeQuestion) {
 				onTimeout();
 			}
 		}
-	}
-
-	function stopCounter() {
-		clearInterval(timer);
-	}
-
-	function resetCounter() {
-		counter = 0;
 	}
 
 	function timeChanged() {
@@ -142,6 +143,26 @@ function application() {
 		checkQuestionIsNotAnswered();
 		getNewQuestion();
 		initCounter();
+	}
+
+	function timeChanged() {
+		var timerContainer = document.querySelector('.timer');
+		timerContainer.innerHTML = counter;
+	}
+
+	function timeout() {
+		stopCounter();
+		resetCounter();
+		checkQuestionIsNotAnswered();
+		getNewQuestion();
+		initCounter();
+	}
+	function stopCounter() {
+		clearInterval(timer);
+	}
+
+	function resetCounter() {
+		counter = 0;
 	}
 
 	function getNewQuestion() {
@@ -166,19 +187,20 @@ function application() {
 
 		} else {
 			gameOver();
-			// resetGame();
 		}
 		indexQuestion++;
 	}
+
 	function gameOver() {
 		onGame = false;
 		addGameOverMessage();
 		addGamerName();
 	}
+
 	function addGameOverMessage() {
 		showQuiz.classList.add('hidden');
 		message.innerHTML = '¡El juego ha terminado!';
-		message.style.color = '#6F1BF3';
+		message.style.color = '#D90368';
 
 	}
 	function addGamerName() {
@@ -191,7 +213,6 @@ function application() {
 		var answers = document.getElementsByName('answers');
 		var questionID = quizQuestions;
 		questionID = questionID.getAttribute('id');
-
 		for (var i = 0; i < answers.length; i++) {
 			if (answers[i].checked) {
 				userAnswerID = answers[i].id;
@@ -221,6 +242,7 @@ function application() {
 		addCorrectAnswers();
 		totalScore += getScoresWhenAnswerIsCorrect(points, counter);
 	}
+
 	function updateUINotCorrectAnswers() {
 		addFailedAnswers();
 		totalScore += getScoresWhenAnswerIsNotCorrect(points, counter);
@@ -228,13 +250,13 @@ function application() {
 
 	function addCorrectAnswers() {
 		correctAnswers++;
-		var correctAnswerContainer = document.querySelector('.correct-answer');
+		correctAnswerContainer = document.querySelector('.correct-answer');
 		correctAnswerContainer.innerHTML = correctAnswers;
 	}
 
 	function addFailedAnswers() {
 		failedAnswers++;
-		var failedAnswerContainer = document.querySelector('.failed-answer');
+		failedAnswerContainer = document.querySelector('.failed-answer');
 		failedAnswerContainer.innerHTML = failedAnswers;
 	}
 
@@ -249,6 +271,7 @@ function application() {
 			return score;
 		}
 	}
+
 	function getScoresWhenAnswerIsNotCorrect(score, scoreTime) {
 		if (scoreTime <= 10) {
 			return score - 1;
@@ -257,6 +280,7 @@ function application() {
 			return score - 2;
 		}
 	}
+
 	function getScoresWhenQuestionIsNotAnswer(score) {
 		return score - 3;
 	};
@@ -269,14 +293,14 @@ function application() {
 
 	function saveTime() {
 		timeUser.push(counter);
-		// console.log('[SaveTime counter ]: ' + counter);
-		// console.log('[SaveTime timeUser ]: ' + timeUser);
+		console.log('[SaveTime counter ]: ' + counter);
+		console.log('[SaveTime timeUser ]: ' + timeUser);
 		var numAnswers = timeUser.length;
 		var sumtimeUser = timeUser.reduce(function(accumulator, nextValue){
 		  return accumulator + nextValue;
 		}, 0);
 		var average = sumtimeUser / numAnswers;
-		var statisticsTime = document.querySelector('.statistics-time');
+		statisticsTime = document.querySelector('.statistics-time');
 		statisticsTime.innerHTML = average.toFixed(0);
 	}
 
@@ -297,17 +321,36 @@ function application() {
 			itemsHistoric += '<li class="item-historic">' + entries[i].name + ': ' + entries[i].points + ' puntos</li>';
 		}
 		historic.innerHTML = itemsHistoric;
-
 	}
 
 	function resetGame() {
-		document.querySelector('.input-name').value = '';
-		message.innerHTML = '';
-		infoGamerContainer.classList.add('hidden');
-		startGameContainer.classList.remove('hidden');
+		resetPanel();
+		resetStatistics();
+		resetScores();
+		stopCounter();
+		resetCounter();
+	}
 
-		// NO ME VUELVE A EMPEZAR EL JUEGO
+function resetPanel() {
+	document.querySelector('.input-name').value = '';
+	message.innerHTML = '';
+	infoGamerContainer.classList.add('hidden');
+	startGameContainer.classList.remove('hidden');
+	indexQuestion = 0;
+}
+	function resetStatistics() {
+		timeUser = [];
+		statisticsTime.innerHTML = 0;
+		correctAnswers = 0;
+		correctAnswerContainer = document.querySelector('.correct-answer');
+		correctAnswerContainer.innerHTML = 0;
+		failedAnswers = 0;
+		failedAnswerContainer = document.querySelector('.failed-answer');
+		failedAnswerContainer.innerHTML = 0;
 
+	}
+	function resetScores() {
+		totalScore = 0;
 	}
 
 	return {
