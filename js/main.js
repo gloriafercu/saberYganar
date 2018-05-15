@@ -201,7 +201,7 @@ function application() {
 		showQuiz.classList.add('hidden');
 		message.innerHTML = '¡El juego ha terminado!';
 		message.style.color = '#5863F8';
-		message.style.top = '-40px';
+		message.style.top = '-30px';
 
 	}
 	function addGamerName() {
