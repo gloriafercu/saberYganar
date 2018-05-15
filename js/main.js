@@ -201,6 +201,7 @@ function application() {
 		showQuiz.classList.add('hidden');
 		message.innerHTML = '¡El juego ha terminado!';
 		message.style.color = '#D90368';
+		message.style.top = '-60px';
 
 	}
 	function addGamerName() {
@@ -229,12 +230,15 @@ function application() {
 	function isCorrect() {
 		message.innerHTML = '¡Correcto!';
 		message.style.color = '#23CE6B';
+		message.style.top = '0';
+
 		updateUIcorrectAnswers();
 	}
 
 	function isNotcorrect() {
 		message.innerHTML = '¡Fallaste!';
 		message.style.color = '#F15152';
+		message.style.top = '0';
 		updateUINotCorrectAnswers();
 	}
 
